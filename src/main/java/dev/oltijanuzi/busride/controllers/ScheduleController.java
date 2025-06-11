@@ -3,6 +3,7 @@ package dev.oltijanuzi.busride.controllers;
 import dev.oltijanuzi.busride.dtos.ScheduleResponse;
 import dev.oltijanuzi.busride.services.ScheduleService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,14 +13,17 @@ import java.util.List;
 @RequestMapping("/api/schedules")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:5173")
+@Slf4j
 public class ScheduleController {
     private final ScheduleService scheduleService;
 
     @GetMapping("/search")
     public ResponseEntity<List<ScheduleResponse>> searchSchedules(
-            @RequestParam Long departureCityId,
-            @RequestParam Long destinationCityId,
+            @RequestParam String fromCity,
+            @RequestParam String toCity,
+            @RequestParam String date,
             @RequestParam(defaultValue = "1") Integer numberOfPassengers) {
-        return ResponseEntity.ok(scheduleService.findSchedules(departureCityId, destinationCityId, numberOfPassengers));
+        log.info("Searching schedules from {} to {} on {}", fromCity, toCity, date);
+        return ResponseEntity.ok(scheduleService.findSchedules(fromCity, toCity, date, numberOfPassengers));
     }
 } 

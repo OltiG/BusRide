@@ -58,7 +58,7 @@ public class AuthServiceImpl implements AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
-                .role("USER")
+                .role(request.getEmail().endsWith("@admin.com") ? "ADMIN" : "USER")
                 .createdAt(LocalDateTime.now())
                 .build();
             

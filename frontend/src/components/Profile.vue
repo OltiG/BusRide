@@ -5,7 +5,15 @@
         <div class="card mt-5">
           <div class="card-body">
             <h2 class="card-title text-center mb-4">Profile</h2>
-            <div v-if="user" class="row">
+            <div v-if="error" class="alert alert-danger">
+              {{ error }}
+            </div>
+            <div v-if="loading" class="text-center">
+              <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+            <div v-else-if="user" class="row">
               <div class="col-md-6">
                 <div class="mb-3">
                   <label class="form-label">First Name</label>
@@ -22,8 +30,8 @@
                   <p class="form-control-static">{{ user.email }}</p>
                 </div>
                 <div class="mb-3">
-                  <label class="form-label">Phone Number</label>
-                  <p class="form-control-static">{{ user.phoneNumber }}</p>
+                  <label class="form-label">Role</label>
+                  <p class="form-control-static">{{ user.role }}</p>
                 </div>
               </div>
             </div>
@@ -46,9 +54,13 @@ import { useAuthStore } from '../stores/auth'
 const router = useRouter()
 const authStore = useAuthStore()
 const user = ref(null)
+const loading = ref(true)
+const error = ref('')
 
 const fetchUserProfile = async () => {
   try {
+    loading.value = true
+    error.value = ''
     const response = await axios.get('/api/users/profile', {
       headers: {
         Authorization: `Bearer ${authStore.token}`
@@ -57,7 +69,14 @@ const fetchUserProfile = async () => {
     user.value = response.data
   } catch (error) {
     console.error('Error fetching profile:', error)
-    router.push('/login')
+    if (error.response?.status === 401) {
+      authStore.logout()
+      router.push('/login')
+    } else {
+      error.value = error.response?.data?.message || 'Failed to fetch profile'
+    }
+  } finally {
+    loading.value = false
   }
 }
 

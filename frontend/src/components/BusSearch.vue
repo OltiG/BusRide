@@ -57,12 +57,14 @@
             <div class="card-body">
               <div class="row">
                 <div class="col-md-8">
-                  <h5 class="card-title">{{ schedule.route.startLocation }} → {{ schedule.route.endLocation }}</h5>
+                  <h5 class="card-title">{{ schedule.departureCity }} → {{ schedule.destinationCity }}</h5>
                   <p class="card-text">
                     <strong>Departure:</strong> {{ formatTime(schedule.departureTime) }}<br>
                     <strong>Arrival:</strong> {{ formatTime(schedule.arrivalTime) }}<br>
-                    <strong>Price:</strong> ${{ schedule.currentPrice }}<br>
-                    <strong>Available Seats:</strong> {{ schedule.availableSeats }}
+                    <strong>Price:</strong> ${{ schedule.price }}<br>
+                    <strong>Total Price:</strong> ${{ schedule.totalPrice }}<br>
+                    <strong>Available Seats:</strong> {{ schedule.availableSeats }}<br>
+                    <strong>Agency:</strong> {{ schedule.agencyName }}
                   </p>
                 </div>
                 <div class="col-md-4 text-end">

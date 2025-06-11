@@ -7,20 +7,27 @@ import dev.oltijanuzi.busride.repository.RouteRepository;
 import dev.oltijanuzi.busride.repository.ScheduleRepository;
 import dev.oltijanuzi.busride.services.ScheduleService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ScheduleServiceImpl implements ScheduleService {
     private final RouteRepository routeRepository;
     private final ScheduleRepository scheduleRepository;
 
     @Override
-    public List<ScheduleResponse> findSchedules(Long departureCityId, Long destinationCityId, Integer numberOfPassengers) {
-        List<Route> routes = routeRepository.findByDepartureAndDestination(departureCityId, destinationCityId);
+    public List<ScheduleResponse> findSchedules(String fromCity, String toCity, String date, Integer numberOfPassengers) {
+        log.info("Finding schedules from {} to {} on {}", fromCity, toCity, date);
+        
+        List<Route> routes = routeRepository.findByDepartureAndDestination(fromCity, toCity);
+        log.info("Found {} routes", routes.size());
         
         return routes.stream()
             .flatMap(route -> scheduleRepository.findActiveSchedulesByRoute(route.getId()).stream())
