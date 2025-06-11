@@ -1,0 +1,8 @@
+-- Alter users table to change VARCHAR fields to NVARCHAR(250)
+ALTER TABLE users 
+    ALTER COLUMN username TYPE NVARCHAR(250),
+    ALTER COLUMN email TYPE NVARCHAR(250),
+    ALTER COLUMN password TYPE NVARCHAR(250),
+    ALTER COLUMN first_name TYPE NVARCHAR(250),
+    ALTER COLUMN last_name TYPE NVARCHAR(250),
+    ALTER COLUMN role TYPE NVARCHAR(250); 

@@ -2,36 +2,56 @@ package dev.oltijanuzi.busride.controllers;
 
 import dev.oltijanuzi.busride.dtos.AuthRequest;
 import dev.oltijanuzi.busride.dtos.AuthResponse;
-import dev.oltijanuzi.busride.dtos.RegisterRequest;
-import dev.oltijanuzi.busride.entities.User;
 import dev.oltijanuzi.busride.services.AuthService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
+@Slf4j
 public class AuthController {
-
     private final AuthService authService;
 
-    // Register a new user
-    @PostMapping("/register")
-    public ResponseEntity<AuthResponse> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
-        AuthResponse authResponse = authService.register(registerRequest);
-        return new ResponseEntity<>(authResponse, HttpStatus.CREATED);
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody AuthRequest request) {
+        log.info("Received login request for email: {}", request.getEmail());
+        try {
+            AuthResponse response = authService.login(request);
+            log.info("Login successful for email: {}", request.getEmail());
+            return ResponseEntity.ok(response);
+        } catch (BadCredentialsException e) {
+            log.error("Invalid credentials for email: {}", request.getEmail());
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Invalid email or password");
+            return ResponseEntity.badRequest().body(error);
+        } catch (Exception e) {
+            log.error("Login failed for email: {}", request.getEmail(), e);
+            Map<String, String> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
     }
 
-    // Login existing user
-    @PostMapping("/login")
-    public ResponseEntity<AuthResponse> loginUser(@Valid @RequestBody AuthRequest authRequest) {
-        AuthResponse authResponse = authService.login(authRequest);
-        if (authResponse == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody AuthRequest request) {
+        log.info("Received registration request for email: {}", request.getEmail());
+        try {
+            AuthResponse response = authService.register(request);
+            log.info("Registration successful for email: {}", request.getEmail());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Registration failed for email: {}", request.getEmail(), e);
+            Map<String, String> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
         }
-        return ResponseEntity.ok(authResponse);
     }
-}
+} 
